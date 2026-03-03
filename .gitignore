@@ -1,0 +1,9 @@
+COMMAND.md
+
+# Data
+data/*.csv
+data/*.zip
+data/ml-*/
+__pycache__/
+*.db  # SQLite DB
+.env
