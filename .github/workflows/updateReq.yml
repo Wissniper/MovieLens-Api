@@ -12,12 +12,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Automatic requirements.txt for Python Project
-        uses: ryan-rozario/pipreqs-action@master
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          PROJECT_PATH: .
-          REQUIREMENT_PATH: ./requirements.txt
-          PROJECT_NAME: movielens-api
+          python-version: '3.11'
+
+      - name: Install pipreqs
+        run: pip install pipreqs
+
+      - name: Generate requirements.txt
+        run: |
+          # --force overwrites the existing file if it exists
+          # . scans the current directory
+          pipreqs . --force --savepath requirements.txt
+
+      - name: Commit and Push requirements.txt
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update requirements.txt [skip ci]"
+          file_pattern: 'requirements.txt'
