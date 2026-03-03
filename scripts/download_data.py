@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import requests
+import httpx
 import zipfile
 import os
 from pathlib import Path
@@ -18,12 +18,12 @@ def download_dataset(size="small"):
     
     if not zip_path.exists():
         print(f"Downloading {size} dataset...")
-        resp = requests.get(url, stream=True)
-        resp.raise_for_status()
-        
-        with open(zip_path, "wb") as f:
-            for chunk in resp.iter_content(chunk_size=8192):
-                f.write(chunk)
+        with httpx.Client(follow_redirects=True) as client:
+            with client.stream("GET", url) as resp:
+                resp.raise_for_status()
+                with open(zip_path, "wb") as f:
+                    for chunk in resp.iter_bytes(chunk_size=8192):
+                        f.write(chunk)
     else:
         print(f"{zip_path} already exists")
     
@@ -31,7 +31,7 @@ def download_dataset(size="small"):
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
         zip_ref.extractall(DATA_DIR)
     
-    print(f"Dataset ready in {DATA_DIR / 'ml-latest-small'}")
+    print(f"Dataset ready in {DATA_DIR}")
 
 if __name__ == "__main__":
     download_dataset("small")
