@@ -4,6 +4,8 @@ from app.database import engine
 from sqlalchemy import text
 from analysis import recommender
 
+import plotly.express as px
+
 router = APIRouter(prefix="/movies", tags=["movies"])
 
 @router.get("/top-rated")
@@ -47,6 +49,33 @@ def get_genre_ratings():
     
     # Maak van de index weer een gewone kolom en zet om naar dict list
     return genre_stats.reset_index().to_dict(orient="records")
+
+@router.get("/genres/chart")
+def get_genre_chart():
+    # Zelfde logica als hierboven, maar dan voor een visualisatie
+    query = text("""
+        SELECT r.rating, m.genres 
+        FROM ratings r 
+        JOIN movies m ON r.movie_id = m.movie_id
+    """)
+    df = pd.read_sql_query(query, engine)
+    df["genres"] = df["genres"].str.split("|")
+    exploded = df.explode("genres")
+    exploded = exploded[exploded["genres"] != "(no genres listed)"]
+    
+    genre_stats = exploded.groupby("genres")["rating"].agg(["mean", "count"])
+    genre_stats = genre_stats.round(2).reset_index()
+
+    fig = px.bar(
+        genre_stats, 
+        x="genres", 
+        y="mean", 
+        title="Gemiddelde Rating per Genre",
+        color="mean",
+        hover_data=["count"]
+    )
+    
+    return fig.to_json()
 
 @router.get("/{movie_id}/similar")
 def get_similar(movie_id: int, top_k: int = 5):
