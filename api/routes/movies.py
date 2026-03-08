@@ -2,6 +2,7 @@ from fastapi import APIRouter
 import pandas as pd
 from app.database import engine
 from sqlalchemy import text
+from analysis import recommender
 
 router = APIRouter(prefix="/movies", tags=["movies"])
 
@@ -46,3 +47,7 @@ def get_genre_ratings():
     
     # Maak van de index weer een gewone kolom en zet om naar dict list
     return genre_stats.reset_index().to_dict(orient="records")
+
+@router.get("/{movie_id}/similar")
+def get_similar(movie_id: int, top_k: int = 5):
+    return recommender.get_similar_movies(movie_id, top_k)
