@@ -25,3 +25,13 @@ class SimilarMovie(BaseModel):
     title: str
     genres: str
     similarity_score: float
+
+class OverallStats(BaseModel):
+    total_movies: int
+    total_ratings: int
+    unique_users: int
+    average_rating: float
+
+class RatingDistribution(BaseModel):
+    rating: float
+    count: int

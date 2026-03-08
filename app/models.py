@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String, Float, BigInteger
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import DeclarativeBase
 
-# Base is the base class for all our models, it provides the necessary functionality to interact with the database using SQLAlchemy's ORM.
-class Base(declarative_base()): 
+
+class Base(DeclarativeBase):
     pass
 
 class Movie(Base):

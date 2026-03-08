@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.routes import movies, users
+from api.routes import movies, users, stats
 
 app = FastAPI(
     title="MovieLens API",
@@ -9,6 +9,7 @@ app = FastAPI(
 
 app.include_router(movies.router)
 app.include_router(users.router)
+app.include_router(stats.router)
 
 @app.get("/")
 def root():
