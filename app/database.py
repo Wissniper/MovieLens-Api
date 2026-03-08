@@ -1,7 +1,7 @@
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
-DATABASE_URL = "sqlite:///movies.db"
+DATABASE_URL = "sqlite:///localhost/movielens"
 engine = create_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
