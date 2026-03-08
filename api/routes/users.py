@@ -1,11 +1,13 @@
 from fastapi import APIRouter
 import pandas as pd
+from typing import List
 from sqlalchemy import text
 from app.database import engine
+from app import schemas
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-@router.get("/{user_id}/ratings")
+@router.get("/{user_id}/ratings", response_model=List[schemas.UserRatingHistory])
 def get_user_ratings_history(user_id: int):
     query = text("""
         SELECT m.title, r.rating, r.timestamp,

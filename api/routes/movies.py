@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 import pandas as pd
+from typing import List
 from app.database import engine
+from app import schemas
 from sqlalchemy import text
 from analysis import recommender
 
@@ -8,7 +10,7 @@ import plotly.express as px
 
 router = APIRouter(prefix="/movies", tags=["movies"])
 
-@router.get("/top-rated")
+@router.get("/top-rated", response_model=List[schemas.TopRatedMovie])
 def get_top_rated_movies(min_ratings: int = 50, limit: int = 10):
     query = text("""
         SELECT m.movie_id, m.title, m.genres, 
@@ -27,7 +29,7 @@ def get_top_rated_movies(min_ratings: int = 50, limit: int = 10):
     df['avg_rating'] = df['avg_rating'].round(2)
     return df.to_dict(orient="records")
 
-@router.get("/genres/avg-rating")
+@router.get("/genres/avg-rating", response_model=List[schemas.GenreStats])
 def get_genre_ratings():
     query = text("""
         SELECT r.rating, m.genres 
@@ -77,6 +79,6 @@ def get_genre_chart():
     
     return fig.to_json()
 
-@router.get("/{movie_id}/similar")
+@router.get("/{movie_id}/similar", response_model=List[schemas.SimilarMovie])
 def get_similar(movie_id: int, top_k: int = 5):
     return recommender.get_similar_movies(movie_id, top_k)
